@@ -63,6 +63,23 @@ class BouncingCircle:
     def draw(self, surface):
         pygame.draw.circle(surface, (0, 0, 255), (self.x, int(self.y)), self.radius)
 
+class StateControl:
+    def __init__(self):
+        self.stop_event = threading.Event()
+        self.thread = threading.Thread(target=self.motion_loop)
+
+    def start(self):
+        self.thread.start()
+
+    def stop(self):
+        self.stop_event.set()
+        self.thread.join()
+
+    def motion_loop(self):
+        while not self.stop_event.is_set():
+            print("loop")
+            time.sleep(0.3)
+
 
 class Game:
     def __init__(self):
@@ -75,6 +92,9 @@ class Game:
         self.triangle = Triangle()
         self.circle = BouncingCircle()
         self.circle.start()
+
+        self.stc = StateControl()
+        self.stc.start()
 
     def run(self):
         while self.running:
@@ -107,6 +127,7 @@ class Game:
 
     def cleanup(self):
         self.circle.stop()
+        self.stc.stop()
         pygame.quit()
         sys.exit()
 
