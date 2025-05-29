@@ -3,79 +3,115 @@ import sys
 import threading
 import time
 
-# 初期設定
-pygame.init()
+# 定数
 WIDTH, HEIGHT = 640, 480
 FPS = 30
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("横スクロールする三角形と揺れる青い丸")
-clock = pygame.time.Clock()
 
-# 三角形の初期状態
-triangle_x = 0
-triangle_y = HEIGHT // 2
-triangle_speed_x = 5
-triangle_speed_y = 5
 
-# 青い丸の位置（共有変数）
-circle_x = WIDTH // 2
-circle_base_y = HEIGHT // 3
-circle_y = circle_base_y
-circle_radius = 15
+class Triangle:
+    def __init__(self):
+        self.x = 0
+        self.y = HEIGHT // 2
+        self.speed_x = 5
+        self.speed_y = 5
 
-# スレッドで制御する揺れの関数
-def circle_motion():
-    global circle_y
-    direction = 1
-    while True:
-        circle_y += direction * 2
-        if circle_y > circle_base_y + 20 or circle_y < circle_base_y - 20:
-            direction *= -1
-        time.sleep(0.03)  # 約33FPSの動き
+    def update(self, keys):
+        # 横スクロール
+        self.x += self.speed_x
+        if self.x > WIDTH:
+            self.x = -20
 
-# スレッド起動
-circle_thread = threading.Thread(target=circle_motion, daemon=True)
-circle_thread.start()
+        # 上下移動
+        if keys[pygame.K_UP]:
+            self.y -= self.speed_y
+        if keys[pygame.K_DOWN]:
+            self.y += self.speed_y
 
-# メインループ
-running = True
-while running:
-    clock.tick(FPS)
+    def draw(self, surface):
+        points = [
+            (self.x, self.y),
+            (self.x + 20, self.y - 15),
+            (self.x + 20, self.y + 15)
+        ]
+        pygame.draw.polygon(surface, (255, 255, 0), points)
 
-    # イベント処理
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
 
-    # キー入力処理
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_UP]:
-        triangle_y -= triangle_speed_y
-    if keys[pygame.K_DOWN]:
-        triangle_y += triangle_speed_y
+class BouncingCircle:
+    def __init__(self):
+        self.x = WIDTH // 2
+        self.base_y = HEIGHT // 3
+        self.y = self.base_y
+        self.radius = 15
+        self.direction = 1
+        self.stop_event = threading.Event()
+        self.thread = threading.Thread(target=self.motion_loop)
 
-    # 横スクロール処理
-    triangle_x += triangle_speed_x
-    if triangle_x > WIDTH:
-        triangle_x = -20  # 左から再登場
+    def start(self):
+        self.thread.start()
 
-    # 描画処理
-    screen.fill((0, 0, 0))  # 背景を黒にする
+    def stop(self):
+        self.stop_event.set()
+        self.thread.join()
 
-    # 三角形描画
-    triangle_points = [
-        (triangle_x, triangle_y),
-        (triangle_x + 20, triangle_y - 15),
-        (triangle_x + 20, triangle_y + 15)
-    ]
-    pygame.draw.polygon(screen, (255, 255, 0), triangle_points)
+    def motion_loop(self):
+        while not self.stop_event.is_set():
+            self.y += self.direction * 2
+            if self.y > self.base_y + 20 or self.y < self.base_y - 20:
+                self.direction *= -1
+            time.sleep(0.03)
 
-    # 青い丸の描画
-    pygame.draw.circle(screen, (0, 0, 255), (circle_x, int(circle_y)), circle_radius)
+    def draw(self, surface):
+        pygame.draw.circle(surface, (0, 0, 255), (self.x, int(self.y)), self.radius)
 
-    pygame.display.flip()
 
-# 終了処理
-pygame.quit()
-sys.exit()
+class Game:
+    def __init__(self):
+        pygame.init()
+        self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
+        pygame.display.set_caption("クラス構造：三角形と青い丸")
+        self.clock = pygame.time.Clock()
+        self.running = True
+
+        self.triangle = Triangle()
+        self.circle = BouncingCircle()
+        self.circle.start()
+
+    def run(self):
+        while self.running:
+            self.clock.tick(FPS)
+            self.handle_events()
+            self.update()
+            self.draw()
+
+        self.cleanup()
+
+    def handle_events(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.running = False
+
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_q]:
+            self.running = False
+
+        self.triangle.update(keys)
+
+    def update(self):
+        pass  # 現状、三角形はキーで更新される。必要なら他のロジック追加。
+
+    def draw(self):
+        self.screen.fill((0, 0, 0))
+        self.triangle.draw(self.screen)
+        self.circle.draw(self.screen)
+        pygame.display.flip()
+
+    def cleanup(self):
+        self.circle.stop()
+        pygame.quit()
+        sys.exit()
+
+
+if __name__ == "__main__":
+    game = Game()
+    game.run()
 
