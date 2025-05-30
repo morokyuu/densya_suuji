@@ -66,6 +66,7 @@ class BouncingCircle:
 class StateControl:
     def __init__(self):
         self.stop_event = threading.Event()
+        self.change_event = threading.Event()
         self.thread = threading.Thread(target=self.motion_loop)
 
     def start(self):
@@ -75,10 +76,18 @@ class StateControl:
         self.stop_event.set()
         self.thread.join()
 
+    def change(self):
+        self.change_event.set()
+
     def motion_loop(self):
+        lp = 0
         while not self.stop_event.is_set():
-            print("loop")
-            time.sleep(0.3)
+            print(f"loop {lp}")
+            if self.change_event.is_set():
+                time.sleep(1)
+            else:
+                time.sleep(0.3)
+            lp += 1
 
 
 class Game:
@@ -97,11 +106,17 @@ class Game:
         self.stc.start()
 
     def run(self):
+        count = 0
         while self.running:
             self.clock.tick(FPS)
             self.handle_events()
             self.update()
             self.draw()
+
+            count += 1
+            if count > 100:
+                self.stc.change()
+            print(count)
 
         self.cleanup()
 
