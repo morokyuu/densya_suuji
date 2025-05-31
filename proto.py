@@ -53,9 +53,18 @@ class StateControl:
             elif self.state == 2:
                 # result disp
                 print("start result disp state")
+
+                result = ""
+                if self.cur_spd > self.spd_lim:
+                    result = "over limit"
+                elif self.cur_spd < self.spd_lim * 0.8:
+                    result = "delay occured"
+                else:
+                    result = "successed"
+
                 tw = TimeoutWatcher(1)
                 while not tw.is_timeout():
-                    print("running")
+                    print(result)
                     time.sleep(0.3)
                 print("done")
                 self.state = 0
@@ -64,7 +73,14 @@ stc = StateControl()
 
 time.sleep(2)
 stc.inform_sign(30)
-time.sleep(5)
+time.sleep(0.5)
+stc.inform_curspd(14)
+time.sleep(0.5)
+stc.inform_curspd(20)
+time.sleep(0.5)
+stc.inform_curspd(30)
+time.sleep(4)
+
 stc.inform_sign(50)
 time.sleep(5)
 
