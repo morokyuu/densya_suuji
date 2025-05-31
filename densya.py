@@ -64,11 +64,13 @@ class BouncingCircle:
 
 class StateControl:
     def __init__(self):
-        self.stop_event = threading.Event()
-        self.sign_event = threading.Event()
-        self.thread = threading.Thread(target=self._loop)
         self.cur_spd = 0
         self.spd_lim = 0
+        self.state = 0
+
+        self.stop_event = threading.Event()
+
+        self.thread = threading.Thread(target=self._loop)
 
     def start(self):
         self.thread.start()
@@ -77,48 +79,66 @@ class StateControl:
         self.stop_event.set()
         self.thread.join()
 
-    def key_input(self,keys):
-        if keys[pygame.K_UP]:
-            self.cur_spd += 1
-        elif keys[pygame.K_DOWN]:
-            self.cur_spd -= 1
-        print(f"cur {self.cur_spd}")
-
-    def sign(self,new_spd):
+    def inform_sign(self,new_spd):
+        if self.state == 1:
+            self.stop()
+            raise("already in input state")
+        if self.state == 2:
+            self.stop()
+            raise("already in result disp state")
         self.spd_lim = new_spd
-        self.sign_event.set()
+        print(f"spd_lim={self.spd_lim}")
+        self.state = 1
 
-    def monitor_time(self,duration, event):
-        start_time = time.perf_counter()
-        while not event.is_st():
-            if time.perf_counter() - start_time >= duration:
-                event.set()
-                break
-
-    def handler_sign_found(self,duration):
-        timer_thread = threading.Thread(target=monitor_time, args=(duration, timeout_event))
-        timer_thread.start()
+    def inform_curspd(self,new_spd):
+        self.cur_spd = new_spd
 
     def _loop(self):
         while not self.stop_event.is_set():
-            if self.sign_event.is_set():
 
+            if self.state == 0:
+                print("main")
+                time.sleep(0.5)
+
+            elif self.state == 1:
                 # sign found
+                print("start input state")
+                tw = TimeoutWatcher(3)
+                while not tw.is_timeout():
+                    print(f"cur={self.cur_spd}")
+                    time.sleep(0.3)
+                print("done")
+                self.state = 2
 
-                pass
+            elif self.state == 2:
+                # result disp
+                print("start result disp state")
+
+                result = ""
+                if self.cur_spd > self.spd_lim:
+                    result = "over limit"
+                elif self.cur_spd < self.spd_lim * 0.8:
+                    result = "delay occured"
+                else:
+                    result = "successed"
+
+                tw = TimeoutWatcher(1)
+                while not tw.is_timeout():
+                    print(result)
+                    time.sleep(0.3)
+                print("done")
+                self.state = 0
 
 
 class Game:
     def __init__(self):
         pygame.init()
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
-        pygame.display.set_caption("クラス構造：三角形と青い丸")
+        pygame.display.set_caption("電車シミュレータ")
         self.clock = pygame.time.Clock()
-        self.running = True
 
-        self.triangle = Triangle()
-        self.circle = BouncingCircle()
-        self.circle.start()
+        self.running = True
+        self.speed = 0
 
         self.stc = StateControl()
         self.stc.start()
@@ -131,6 +151,7 @@ class Game:
             self.draw()
 
         self.cleanup()
+        print("cleanup")
 
     def handle_events(self):
         for event in pygame.event.get():
@@ -140,22 +161,23 @@ class Game:
         keys = pygame.key.get_pressed()
         if keys[pygame.K_q]:
             self.running = False
-        self.stc.key_input(keys)
-        self.triangle.update(keys)
+
+        if keys[pygame.K_UP]:
+            self.speed += 1
+        elif keys[pygame.K_DOWN]:
+            self.speed -= 1
 
     def update(self):
-        pass  # 現状、三角形はキーで更新される。必要なら他のロジック追加。
+        self.stc.inform_curspd(self.speed)
 
     def draw(self):
         self.screen.fill((0, 0, 0))
-        self.triangle.draw(self.screen)
-        self.circle.draw(self.screen)
         pygame.display.flip()
 
     def cleanup(self):
-        self.circle.stop()
         self.stc.stop()
         pygame.quit()
+        print("quit")
         sys.exit()
 
 
