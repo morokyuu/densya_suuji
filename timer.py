@@ -34,7 +34,6 @@ class TimeoutWatcher:
     def __init__(self,duration):
         self.duration = duration
         self.stop_event = threading.Event()
-#        self.event = event
         self.flag = False
         self._thread = threading.Thread(target=self._watch, daemon=True)
         self._thread.start()
@@ -47,6 +46,11 @@ class TimeoutWatcher:
                 self.stop_event.set()
                 self.flag = True
                 break
+            
+    def is_timeout(self):
+        return self.flag
+
+
 
 class StateControl:
     def __init__(self):

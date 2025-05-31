@@ -3,7 +3,6 @@ import sys
 import threading
 import time
 
-# ’è”
 WIDTH, HEIGHT = 640, 480
 FPS = 30
 
@@ -16,12 +15,10 @@ class Triangle:
         self.speed_y = 5
 
     def update(self, keys):
-        # ‰¡ƒXƒNƒ[ƒ‹
         self.x += self.speed_x
         if self.x > WIDTH:
             self.x = -20
 
-        # ã‰ºˆÚ“®
         if keys[pygame.K_UP]:
             self.y -= self.speed_y
         if keys[pygame.K_DOWN]:
@@ -115,7 +112,7 @@ class Game:
     def __init__(self):
         pygame.init()
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
-        pygame.display.set_caption("ƒNƒ‰ƒX\‘¢FOŠpŒ`‚ÆÂ‚¢ŠÛ")
+        pygame.display.set_caption("ã‚¯ãƒ©ã‚¹æ§‹é€ ï¼šä¸‰è§’å½¢ã¨é’ã„ä¸¸")
         self.clock = pygame.time.Clock()
         self.running = True
 
@@ -147,7 +144,7 @@ class Game:
         self.triangle.update(keys)
 
     def update(self):
-        pass  # Œ»óAOŠpŒ`‚ÍƒL[‚ÅXV‚³‚ê‚éB•K—v‚È‚ç‘¼‚ÌƒƒWƒbƒN’Ç‰ÁB
+        pass  # ç¾çŠ¶ã€ä¸‰è§’å½¢ã¯ã‚­ãƒ¼ã§æ›´æ–°ã•ã‚Œã‚‹ã€‚å¿…è¦ãªã‚‰ä»–ã®ãƒ­ã‚¸ãƒƒã‚¯è¿½åŠ ã€‚
 
     def draw(self):
         self.screen.fill((0, 0, 0))
