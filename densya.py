@@ -63,11 +63,15 @@ class BouncingCircle:
     def draw(self, surface):
         pygame.draw.circle(surface, (0, 0, 255), (self.x, int(self.y)), self.radius)
 
+
+
 class StateControl:
     def __init__(self):
         self.stop_event = threading.Event()
-        self.change_event = threading.Event()
-        self.thread = threading.Thread(target=self.motion_loop)
+        self.sign_event = threading.Event()
+        self.thread = threading.Thread(target=self._loop)
+        self.cur_spd = 0
+        self.spd_lim = 0
 
     def start(self):
         self.thread.start()
@@ -76,18 +80,35 @@ class StateControl:
         self.stop_event.set()
         self.thread.join()
 
-    def change(self):
-        self.change_event.set()
+    def key_input(self,keys):
+        if keys[pygame.K_UP]:
+            self.cur_spd += 1
+        elif keys[pygame.K_DOWN]:
+            self.cur_spd -= 1
+        print(f"cur {self.cur_spd}")
 
-    def motion_loop(self):
-        lp = 0
+    def sign(self,new_spd):
+        self.spd_lim = new_spd
+        self.sign_event.set()
+
+    def monitor_time(self,duration, event):
+        start_time = time.perf_counter()
+        while not event.is_st():
+            if time.perf_counter() - start_time >= duration:
+                event.set()
+                break
+
+    def handler_sign_found(self,duration):
+        timer_thread = threading.Thread(target=monitor_time, args=(duration, timeout_event))
+        timer_thread.start()
+
+    def _loop(self):
         while not self.stop_event.is_set():
-            print(f"loop {lp}")
-            if self.change_event.is_set():
-                time.sleep(1)
-            else:
-                time.sleep(0.3)
-            lp += 1
+            if self.sign_event.is_set():
+
+                # sign found
+
+                pass
 
 
 class Game:
@@ -106,17 +127,11 @@ class Game:
         self.stc.start()
 
     def run(self):
-        count = 0
         while self.running:
             self.clock.tick(FPS)
             self.handle_events()
             self.update()
             self.draw()
-
-            count += 1
-            if count > 100:
-                self.stc.change()
-            print(count)
 
         self.cleanup()
 
@@ -128,7 +143,7 @@ class Game:
         keys = pygame.key.get_pressed()
         if keys[pygame.K_q]:
             self.running = False
-
+        self.stc.key_input(keys)
         self.triangle.update(keys)
 
     def update(self):
