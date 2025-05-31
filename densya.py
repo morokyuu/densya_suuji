@@ -133,8 +133,8 @@ class StateControl:
 class Signs:
     def __init__(self):
         self.timer = 0
-        self.INTERVAL = 300-1
-        self.signs = [30,50,65,45,30]
+        self.INTERVAL = 200-1
+        self.signs = [20,45,65,45,30]
         self.sidx = 0
 
     def is_found(self):
