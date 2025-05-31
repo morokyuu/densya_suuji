@@ -1,25 +1,7 @@
 import threading
 import time
+from timer import TimeoutWatcher
 
-class TimeoutWatcher:
-    def __init__(self,duration):
-        self.duration = duration
-        self.stop_event = threading.Event()
-        self.flag = False
-        self._thread = threading.Thread(target=self._watch, daemon=True)
-        self._thread.start()
-
-    def _watch(self):
-        start_time = time.perf_counter()
-        while not self.stop_event.is_set():
-            if time.perf_counter() - start_time >= self.duration:
-                print("timeout event")
-                self.stop_event.set()
-                self.flag = True
-                break
-            
-    def is_timeout(self):
-        return self.flag
 
 
 class StateControl:
@@ -37,17 +19,31 @@ class StateControl:
         self.stop_event.set()
         self.thread.join()
 
+    def inform_sign(self,new_spd):
+        self.spd_lim = new_spd
+        print(f"spd_lim={self.spd_lim}")
+        self.sign_event.set()
+
     def _loop(self):
         while not self.stop_event.is_set():
-            print("start timer")
-            tw = TimeoutWatcher(2)
-            while not tw.flag:
-                print("running")
-                time.sleep(0.7)
-            print("done")
+            print("main")
+            time.sleep(0.2)
+            if self.sign_event.is_set():
+                self.sign_event.clear()
+                print("start timer")
+                tw = TimeoutWatcher(2)
+                while not tw.is_timeout():
+                    print("running")
+                    time.sleep(0.7)
+                print("done")
 
 stc = StateControl()
 
-time.sleep(6)
+time.sleep(2)
+stc.inform_sign(30)
+time.sleep(3)
+stc.inform_sign(50)
+time.sleep(3)
+
 stc.stop()
 pass
