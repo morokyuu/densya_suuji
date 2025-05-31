@@ -3,6 +3,7 @@ import sys
 import threading
 import time
 from timer import TimeoutWatcher
+from sound import SoundPlayer
 
 WIDTH, HEIGHT = 640, 480
 FPS = 30
@@ -174,8 +175,10 @@ class Game:
 
         self.signs = Signs()
 
-        self.font = pygame.font.Font("C:/Windows/Fonts/meiryo.ttc", 200)
+        self.font = pygame.font.Font("C:/Windows/Fonts/meiryo.ttc", 80)
         self.yomifont = pygame.font.Font("C:/Windows/Fonts/meiryo.ttc", 50)
+
+        self.bell = SoundPlayer("./sound/Bell.mp3")
 
 
     def run(self):
@@ -199,10 +202,12 @@ class Game:
 
         if keys[pygame.K_UP]:
             self.speed += 1
+            time.sleep(0.03)
             if self.speed > 130:
                 self.speed = 130
         elif keys[pygame.K_DOWN]:
             self.speed -= 1
+            time.sleep(0.03)
             if self.speed < 0:
                 self.speed = 0
 
@@ -211,12 +216,13 @@ class Game:
 
         if self.signs.is_found():
             self.stc.inform_sign(self.signs.sign)
+            self.bell.play()
 
     def draw(self):
         self.screen.fill((0, 0, 0))
 
         self.text = self.font.render(f"{self.speed}",True,WHITE)
-        self.screen.blit(self.text, (430,170))
+        self.screen.blit(self.text, (int(WIDTH*0.17),int(HEIGHT*0.7)))
 
         pygame.display.flip()
 
