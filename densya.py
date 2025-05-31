@@ -165,8 +165,12 @@ class Game:
 
         if keys[pygame.K_UP]:
             self.speed += 1
+            if self.speed > 130:
+                self.speed = 130
         elif keys[pygame.K_DOWN]:
             self.speed -= 1
+            if self.speed < 0:
+                self.speed = 0
 
     def update(self):
         self.stc.inform_curspd(self.speed)
