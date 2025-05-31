@@ -4,6 +4,7 @@ import threading
 import time
 from timer import TimeoutWatcher
 from sound import SoundPlayer
+from sound import MotorSound
 
 WIDTH, HEIGHT = 640, 480
 FPS = 30
@@ -180,6 +181,9 @@ class Game:
 
         self.bell = SoundPlayer("./sound/Bell.mp3")
 
+        self.motor = MotorSound()
+        self.motor.on()
+
 
     def run(self):
         while self.running:
@@ -213,6 +217,8 @@ class Game:
 
     def update(self):
         self.stc.inform_curspd(self.speed)
+
+        self.motor.set_speed(self.speed)
 
         if self.signs.is_found():
             self.stc.inform_sign(self.signs.sign)
