@@ -133,20 +133,21 @@ class StateControl:
 class Signs:
     def __init__(self):
         self.timer = 0
-        self.INTERVAL = 100-1
+        self.INTERVAL = 300-1
         self.signs = [30,50,65,45,30]
         self.sidx = 0
 
-    def update(self):
+    def is_found(self):
         self.timer += 1
-        print(self.timer)
+        #print(self.timer)
         if self.timer > self.INTERVAL:
             self.timer = 0
-            
 
             self.sidx += 1
             if self.sidx > len(self.signs)-1:
                 self.sidx = 0
+            return True
+        return False
 
     @property
     def sign(self):
@@ -216,11 +217,11 @@ class Game:
 
 
 if __name__ == "__main__":
-    s = Signs()
-    while True:
-        if s.update():
-            print(s.sign)
-        time.sleep(0.017)
+#    s = Signs()
+#    while True:
+#        if s.is_found():
+#            print(s.sign)
+#        time.sleep(0.017)
 
     game = Game()
     game.run()
