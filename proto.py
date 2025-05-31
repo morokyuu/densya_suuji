@@ -8,7 +8,6 @@ class StateControl:
     def __init__(self):
         self.cur_spd = 0
         self.spd_lim = 0
-
         self.state = 0
 
         self.stop_event = threading.Event()
@@ -22,8 +21,10 @@ class StateControl:
 
     def inform_sign(self,new_spd):
         if self.state == 1:
+            self.stop()
             raise("already in input state")
         if self.state == 2:
+            self.stop()
             raise("already in result disp state")
         self.spd_lim = new_spd
         print(f"spd_lim={self.spd_lim}")
@@ -60,7 +61,7 @@ stc = StateControl()
 
 time.sleep(2)
 stc.inform_sign(30)
-time.sleep(5)
+time.sleep(1)
 stc.inform_sign(50)
 time.sleep(5)
 
