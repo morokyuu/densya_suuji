@@ -29,6 +29,25 @@ class TimeLimitedTask:
             self.task_func()
         print("timeout")
 
+
+class TimeoutWatcher:
+    def __init__(self,duration):
+        self.duration = duration
+        self.stop_event = threading.Event()
+#        self.event = event
+        self.flag = False
+        self._thread = threading.Thread(target=self._watch, daemon=True)
+        self._thread.start()
+
+    def _watch(self):
+        start_time = time.perf_counter()
+        while not self.stop_event.is_set():
+            if time.perf_counter() - start_time >= self.duration:
+                print("timeout event")
+                self.stop_event.set()
+                self.flag = True
+                break
+
 class StateControl:
     def __init__(self):
         self.cur_spd = 0
@@ -47,17 +66,12 @@ class StateControl:
 #    def handler_sign_found(self,duration):
 #        timer_thread = threading.Thread(target=monitor_time, args=(duration, self.timeout_event))
 #        timer_thread.start()
-    def task(self):
-        print("run task")
-        time.sleep(0.3)
-
 
     def _loop(self):
         while not self.stop_event.is_set():
-            time.sleep(0.4)
             print("start timer")
-            tmtsk = TimeLimitedTask(3,self.task)
-            for _ in range(10):
+            tw = TimeoutWatcher(2)
+            while not tw.flag:
                 print("main")
                 time.sleep(0.7)
 #        while not self.stop_event.is_set():
