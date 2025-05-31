@@ -1,11 +1,12 @@
 import threading
 import time
 
-class TimeoutTask:
-    def __init__(self,duration):
+class TimeLimitedTask:
+    def __init__(self,duration,task_func):
         self.timeout_event = threading.Event()
         self.stop_event = threading.Event()
 
+        self.task_func = task_func
         timer_thread = threading.Thread(target=self.monitor_time, args=(duration, self.timeout_event))
         timer_thread.start()
         self.thread = threading.Thread(target=self._loop)
@@ -25,8 +26,7 @@ class TimeoutTask:
 
     def _loop(self):
         while not self.timeout_event.is_set():
-            time.sleep(0.3)
-            print("in duration")
+            self.task_func()
         print("timeout")
 
 class StateControl:
@@ -47,12 +47,16 @@ class StateControl:
 #    def handler_sign_found(self,duration):
 #        timer_thread = threading.Thread(target=monitor_time, args=(duration, self.timeout_event))
 #        timer_thread.start()
+    def task(self):
+        print("run task")
+        time.sleep(0.3)
+
 
     def _loop(self):
         while not self.stop_event.is_set():
             time.sleep(0.4)
             print("start timer")
-            tmtsk = TimeoutTask(3)
+            tmtsk = TimeLimitedTask(3,self.task)
             for _ in range(10):
                 print("main")
                 time.sleep(0.7)
