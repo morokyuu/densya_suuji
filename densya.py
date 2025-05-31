@@ -92,6 +92,7 @@ class StateControl:
 
     def inform_curspd(self,new_spd):
         self.cur_spd = new_spd
+        print(f"cur={self.cur_spd}")
 
     def _loop(self):
         while not self.stop_event.is_set():
@@ -105,7 +106,7 @@ class StateControl:
                 print("start input state")
                 tw = TimeoutWatcher(3)
                 while not tw.is_timeout():
-                    print(f"cur={self.cur_spd}")
+                    print("input state")
                     time.sleep(0.3)
                 print("done")
                 self.state = 2
