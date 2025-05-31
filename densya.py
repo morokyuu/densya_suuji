@@ -7,6 +7,12 @@ from timer import TimeoutWatcher
 WIDTH, HEIGHT = 640, 480
 FPS = 30
 
+WHITE = (255, 255, 255)
+GRAY = (170, 170, 170)
+BLACK = (0, 0, 0)
+BLUE = (100, 100, 255)
+
+
 
 class Triangle:
     def __init__(self):
@@ -168,6 +174,9 @@ class Game:
 
         self.signs = Signs()
 
+        self.font = pygame.font.Font("C:/Windows/Fonts/meiryo.ttc", 200)
+        self.yomifont = pygame.font.Font("C:/Windows/Fonts/meiryo.ttc", 50)
+
 
     def run(self):
         while self.running:
@@ -197,16 +206,18 @@ class Game:
             if self.speed < 0:
                 self.speed = 0
 
-
     def update(self):
         self.stc.inform_curspd(self.speed)
 
         if self.signs.is_found():
             self.stc.inform_sign(self.signs.sign)
 
-
     def draw(self):
         self.screen.fill((0, 0, 0))
+
+        self.text = self.font.render(f"{self.speed}",True,WHITE)
+        self.screen.blit(self.text, (430,170))
+
         pygame.display.flip()
 
     def cleanup(self):
@@ -217,12 +228,6 @@ class Game:
 
 
 if __name__ == "__main__":
-#    s = Signs()
-#    while True:
-#        if s.is_found():
-#            print(s.sign)
-#        time.sleep(0.017)
-
     game = Game()
     game.run()
 
