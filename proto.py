@@ -25,17 +25,25 @@ class StateControl:
         self.sign_event.set()
 
     def _loop(self):
+        state = 0
         while not self.stop_event.is_set():
-            print("main")
-            time.sleep(0.2)
-            if self.sign_event.is_set():
+
+            if state == 0:
+                print("main")
+                time.sleep(0.5)
+
+            elif self.sign_event.is_set():
+                state = 1
+                # sign found
                 self.sign_event.clear()
-                print("start timer")
-                tw = TimeoutWatcher(2)
+                print("start input state")
+                tw = TimeoutWatcher(3)
                 while not tw.is_timeout():
                     print("running")
-                    time.sleep(0.7)
+                    time.sleep(0.3)
                 print("done")
+            elif state == 2:
+                pass
 
 stc = StateControl()
 
