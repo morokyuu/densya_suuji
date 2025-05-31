@@ -2,6 +2,7 @@ import pygame
 import sys
 import threading
 import time
+from timer import TimeoutWatcher
 
 WIDTH, HEIGHT = 640, 480
 FPS = 30
@@ -92,7 +93,6 @@ class StateControl:
 
     def inform_curspd(self,new_spd):
         self.cur_spd = new_spd
-        print(f"cur={self.cur_spd}")
 
     def _loop(self):
         while not self.stop_event.is_set():
@@ -130,6 +130,27 @@ class StateControl:
                 print("done")
                 self.state = 0
 
+class Signs:
+    def __init__(self):
+        self.timer = 0
+        self.INTERVAL = 100-1
+        self.signs = [30,50,65,45,30]
+        self.sidx = 0
+
+    def update(self):
+        self.timer += 1
+        print(self.timer)
+        if self.timer > self.INTERVAL:
+            self.timer = 0
+            
+
+            self.sidx += 1
+            if self.sidx > len(self.signs)-1:
+                self.sidx = 0
+
+    @property
+    def sign(self):
+        return self.signs[self.sidx]
 
 class Game:
     def __init__(self):
@@ -143,6 +164,9 @@ class Game:
 
         self.stc = StateControl()
         self.stc.start()
+
+        self.signs = Signs()
+
 
     def run(self):
         while self.running:
@@ -172,8 +196,13 @@ class Game:
             if self.speed < 0:
                 self.speed = 0
 
+
     def update(self):
         self.stc.inform_curspd(self.speed)
+
+        if self.signs.is_found():
+            self.stc.inform_sign(self.signs.sign)
+
 
     def draw(self):
         self.screen.fill((0, 0, 0))
@@ -187,6 +216,12 @@ class Game:
 
 
 if __name__ == "__main__":
+    s = Signs()
+    while True:
+        if s.update():
+            print(s.sign)
+        time.sleep(0.017)
+
     game = Game()
     game.run()
 
