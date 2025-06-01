@@ -4,6 +4,7 @@ import threading
 import time
 from timer import TimeoutWatcher
 from sound import MotorSound
+from enum import Enum
 
 ## sound effect from
 ## https://soundeffect-lab.info/
@@ -72,12 +73,16 @@ class BouncingCircle:
         pygame.draw.circle(surface, (0, 0, 255), (self.x, int(self.y)), self.radius)
 
 
+class SC_State(Enum):
+    RUN = 0
+    SIGN = 1
+    RESULT = 2
 
 class StateControl:
     def __init__(self):
         self.cur_spd = 0
         self.spd_lim = 0
-        self.state = 0
+        self.state = SC_State.RUN
 
         self.stop_event = threading.Event()
 
@@ -91,15 +96,15 @@ class StateControl:
         self.thread.join()
 
     def inform_sign(self,new_spd):
-        if self.state == 1:
+        if self.state == SC_State.SIGN:
             self.stop()
             raise("already in input state")
-        if self.state == 2:
+        if self.state == SC_State.RESULT:
             self.stop()
             raise("already in result disp state")
         self.spd_lim = new_spd
         print(f"spd_lim={self.spd_lim}")
-        self.state = 1
+        self.state = SC_State.SIGN
 
     def inform_curspd(self,new_spd):
         self.cur_spd = new_spd
@@ -107,11 +112,11 @@ class StateControl:
     def _loop(self):
         while not self.stop_event.is_set():
 
-            if self.state == 0:
+            if self.state == SC_State.RUN:
                 print("main")
                 time.sleep(0.5)
 
-            elif self.state == 1:
+            elif self.state == SC_State.SIGN:
                 # sign found
                 print("start input state")
                 tw = TimeoutWatcher(3)
@@ -119,9 +124,9 @@ class StateControl:
                     print("input state")
                     time.sleep(0.3)
                 print("done")
-                self.state = 2
+                self.state = SC_State.RESULT
 
-            elif self.state == 2:
+            elif self.state == SC_State.RESULT:
                 # result disp
                 print("start result disp state")
 
@@ -138,7 +143,7 @@ class StateControl:
                     print(result)
                     time.sleep(0.3)
                 print("done")
-                self.state = 0
+                self.state = SC_State.RUN
 
 
 class Signs:
@@ -243,6 +248,7 @@ class Game:
     def cleanup(self):
         self.stc.stop()
         pygame.quit()
+        self.motor.close()
         print("quit")
         sys.exit()
 

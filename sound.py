@@ -37,7 +37,7 @@ class MotorSound:
         freq = self.base_freq + speed * self.freq_scale
         self._freq.setValue(freq)
 
-    def __del__(self):
+    def close(self):
         self.server.stop()
         self.server.shutdown()
 
