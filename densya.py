@@ -7,6 +7,7 @@ from sound import MotorSound
 from sound import SoundPlayer
 from enum import Enum
 from font import FontRenderer
+from landscape import Landscape, Sky, Train, Tree
 
 ## sound effect from
 ## https://soundeffect-lab.info/
@@ -19,61 +20,14 @@ GRAY = (170, 170, 170)
 BLACK = (0, 0, 0)
 BLUE = (100, 100, 255)
 
+GREEN = (0,180,0)
+CYAN = (0,240,240)
+ORANGERED = (255,69,0)
+FORESTGREEN = (34,139,34)
+BROWN = (139,69,19)
+
 
 RESULT_DISP_DURATION = 0.8
-
-class Triangle:
-    def __init__(self):
-        self.x = 0
-        self.y = HEIGHT // 2
-        self.speed_x = 5
-        self.speed_y = 5
-
-    def update(self, keys):
-        self.x += self.speed_x
-        if self.x > WIDTH:
-            self.x = -20
-
-        if keys[pygame.K_UP]:
-            self.y -= self.speed_y
-        if keys[pygame.K_DOWN]:
-            self.y += self.speed_y
-
-    def draw(self, surface):
-        points = [
-            (self.x, self.y),
-            (self.x + 20, self.y - 15),
-            (self.x + 20, self.y + 15)
-        ]
-        pygame.draw.polygon(surface, (255, 255, 0), points)
-
-
-class BouncingCircle:
-    def __init__(self):
-        self.x = WIDTH // 2
-        self.base_y = HEIGHT // 3
-        self.y = self.base_y
-        self.radius = 15
-        self.direction = 1
-        self.stop_event = threading.Event()
-        self.thread = threading.Thread(target=self.motion_loop)
-
-    def start(self):
-        self.thread.start()
-
-    def stop(self):
-        self.stop_event.set()
-        self.thread.join()
-
-    def motion_loop(self):
-        while not self.stop_event.is_set():
-            self.y += self.direction * 2
-            if self.y > self.base_y + 20 or self.y < self.base_y - 20:
-                self.direction *= -1
-            time.sleep(0.03)
-
-    def draw(self, surface):
-        pygame.draw.circle(surface, (0, 0, 255), (self.x, int(self.y)), self.radius)
 
 
 class SC_State(Enum):
@@ -265,6 +219,8 @@ class Game:
         self.motor = MotorSound()
         self.motor.on()
 
+        self.landscp = Landscape(self.screen)
+
 
     def run(self):
         while self.running:
@@ -305,19 +261,24 @@ class Game:
             self.stc.inform_sign(self.signs.sign)
             self.snd_bell.play()
 
+        self.landscp.update(self.speed)
 
 
     def draw(self):
         self.screen.fill((0, 0, 0))
 
+        ## landscape
+        self.landscp.draw()
+
+        ## result disp
         state,result = self.stc.get_state()
         if state == SC_State.SIGN:
             self.sign_display.draw(self.signs.sign)
         elif state == SC_State.RESULT:
             self.res_display.show(result)
 
+        ## speed meter
         self.spd_meter.draw(self.speed)
-        #self._draw_speed_meter(self.speed)
 
         pygame.display.flip()
 
