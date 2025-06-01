@@ -126,10 +126,13 @@ class StateControl:
                 result = ""
                 if self.cur_spd > self.spd_lim:
                     result = "over limit"
+#                    self.snd_delayed.play()
                 elif self.cur_spd < self.spd_lim * 0.8:
                     result = "delay occured"
+#                    self.snd_delayed.play()
                 else:
                     result = "successed"
+#                    self.snd_success.play()
 
                 tw = TimeoutWatcher(1)
                 while not tw.is_timeout():
@@ -164,6 +167,7 @@ class Signs:
 class Game:
     def __init__(self):
         pygame.init()
+        pygame.mixer.init()
         self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
         pygame.display.set_caption("電車シミュレータ")
         self.clock = pygame.time.Clock()
@@ -179,10 +183,16 @@ class Game:
         self.font = pygame.font.Font("C:/Windows/Fonts/meiryo.ttc", 80)
         self.yomifont = pygame.font.Font("C:/Windows/Fonts/meiryo.ttc", 50)
 
-        self.bell = SoundPlayer("./sound/Bell.mp3")
+    ## sound effectはmp3ではなくてほかのが推奨らしい。musicは単一。soundは複数ｃｈ持てる
+        self.snd_bell = SoundPlayer("./sound/Bell.mp3")
+        self.snd_success = SoundPlayer("./sound/クイズ正解5.mp3")
+#        self.snd_delayed = SoundPlayer("./sound/クイズ不正解1.mp3")
+        #self.bell = SoundPlayer("./sound/Bell.mp3")
+
+        self.snd_success.play()
 
         self.motor = MotorSound()
-        self.motor.on()
+#        self.motor.on()
 
 
     def run(self):
@@ -222,7 +232,7 @@ class Game:
 
         if self.signs.is_found():
             self.stc.inform_sign(self.signs.sign)
-            self.bell.play()
+            self.snd_bell.play()
 
     def draw(self):
         self.screen.fill((0, 0, 0))
@@ -240,6 +250,17 @@ class Game:
 
 
 if __name__ == "__main__":
-    game = Game()
-    game.run()
+    pygame.mixer.init()
+    snd_bell = SoundPlayer("./sound/Bell.mp3")
+    snd_success = SoundPlayer("./sound/クイズ正解5.mp3")
+
+    snd_bell.play()
+    snd_success.play()
+    time.sleep(0.3)
+    snd_success.play()
+    time.sleep(3)
+
+
+#    game = Game()
+#    game.run()
 
