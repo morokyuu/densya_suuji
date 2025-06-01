@@ -186,17 +186,37 @@ class Signs:
 class SpeedMeter:
     def __init__(self,screen):
         font_name = "C:/Windows/Fonts/meiryo.ttc"
-        fnt_spd = FontRenderer(screen,font_name=font_name,font_size=70)
-        fnt_yomi = FontRenderer(font_name=font_name,font_size=30)
+        self.fnt_spd = FontRenderer(screen,font_name=font_name,font_size=70)
+        self.fnt_yomi = FontRenderer(screen,font_name=font_name,font_size=30)
 
     def draw(self,speed):
         meter_pos = (int(WIDTH*0.17),int(HEIGHT*0.7))
-        self.text = self.draw_center(f"{self.speed}",True,WHITE)
-        self.screen.blit(self.text, (meter_pos[0],meter_pos[1]))
+        self.fnt_spd.draw_center(f"{speed}",meter_pos)
+        self.fnt_yomi.draw_center("はやさ",(meter_pos[0],meter_pos[1]+85))
 
-        self.title = self.yomifont.render("はやさ",True,WHITE)
-        self.screen.blit(self.title, (meter_pos[0],meter_pos[1]+85))
 
+class ResultDisplay:
+    def __init__(self,screen):
+        self.snd_success = SoundPlayer("./sound/クイズ正解5.mp3")
+        self.snd_delayed = SoundPlayer("./sound/警告音1.mp3")
+        self.snd_overlim = SoundPlayer("./sound/クイズ不正解1.mp3")
+
+        self.result_msg = {
+                Result.SUCCESS:"successed",
+                Result.OVERLIM:"over limit",
+                Result.DELAYED:"delayed"
+                }
+        self.result_sound = {
+                Result.SUCCESS:self.snd_success.play,
+                Result.OVERLIM:self.snd_overlim.play,
+                Result.DELAYED:self.snd_delayed.play
+                }
+        font_name = "C:/Windows/Fonts/meiryo.ttc"
+        self.fnt_result = FontRenderer(screen,font_name=font_name,font_size=60)
+
+    def show(self,result):
+        self.fnt_result.draw_center(f"{self.result_msg[result]}",(WIDTH//2,HEIGHT//2))
+        self.result_sound[result]()
 
 
 class Game:
@@ -209,24 +229,19 @@ class Game:
 
         self.running = True
         self.speed = 0
-        self.spd_meter = SpeedMeter()
+        self.spd_meter = SpeedMeter(self.screen)
+        self.res_display = ResultDisplay(self.screen)
 
         self.stc = StateControl()
         self.stc.start()
 
         self.signs = Signs()
 
-        #self.font = pygame.font.Font("C:/Windows/Fonts/meiryo.ttc", 70)
-        #self.yomifont = pygame.font.Font("C:/Windows/Fonts/meiryo.ttc", 30)
-
 #        font_name = "C:/Windows/Fonts/meiryo.ttc"
 #        fntr = FontRenderer(font_name=font_name,font_size=40)
 #        sfntr = FontRenderer(font_name=font_name,font_size=30,color=(120,200,100))
 
         self.snd_bell = SoundPlayer("./sound/Bell.mp3")
-        self.snd_success = SoundPlayer("./sound/クイズ正解5.mp3")
-        self.snd_delayed = SoundPlayer("./sound/警告音1.mp3")
-        self.snd_overlim = SoundPlayer("./sound/クイズ不正解1.mp3")
 
         self.snd_bell.play()
 
@@ -273,22 +288,6 @@ class Game:
             self.stc.inform_sign(self.signs.sign)
             self.snd_bell.play()
 
-    def _show_result(self,result):
-        result_msg = {
-                Result.SUCCESS:"successed",
-                Result.OVERLIM:"over limit",
-                Result.DELAYED:"delayed"
-                }
-        result_sound = {
-                Result.SUCCESS:self.snd_success.play,
-                Result.OVERLIM:self.snd_overlim.play,
-                Result.DELAYED:self.snd_delayed.play
-                }
-        result_sound[result]()
-
-        self.text = self.font.render(f"{result_msg[result]}",True,WHITE)
-        self.screen.blit(self.text, (int(WIDTH*0.45),int(HEIGHT*0.2)))
-
 
 
     def draw(self):
@@ -296,12 +295,13 @@ class Game:
 
         state,result = self.stc.get_state()
         if state == SC_State.SIGN:
-            self.text = self.font.render(f"{self.signs.sign}",True,WHITE)
-            self.screen.blit(self.text, (int(WIDTH*0.75),int(HEIGHT*0.7)))
+            #self.text = self.font.render(f"{self.signs.sign}",True,WHITE)
+            #self.screen.blit(self.text, (int(WIDTH*0.75),int(HEIGHT*0.7)))
+            pass
         elif state == SC_State.RESULT:
-            self._show_result(result)
+            self.res_display.show(result)
 
-        self.spd_meter(self.speed)
+        self.spd_meter.draw(self.speed)
         #self._draw_speed_meter(self.speed)
 
         pygame.display.flip()
@@ -315,26 +315,26 @@ class Game:
 
 
 if __name__ == "__main__":
-#    game = Game()
-#    game.run()
+    game = Game()
+    game.run()
 
 
-    WIDTH,HEIGHT = 640,480
-
-    pygame.init()
-    pygame.mixer.init()
-    screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    pygame.display.set_caption("電車シミュレータ")
-    
-    font_name = "C:/Windows/Fonts/meiryo.ttc"
-    fntr = FontRenderer(screen, font_name=font_name,font_size=40)
-    sfntr = FontRenderer(screen, font_name=font_name,font_size=30,color=(120,200,100))
-    
-    screen.fill((0, 0, 0))
-    
-    fntr.draw_center("hogehoge",(WIDTH//2,HEIGHT//2))
-    sfntr.draw_center("12345",(WIDTH//2,HEIGHT//2+50))
-
-    pygame.display.flip()
-
-    time.sleep(3)
+#    WIDTH,HEIGHT = 640,480
+#
+#    pygame.init()
+#    pygame.mixer.init()
+#    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+#    pygame.display.set_caption("電車シミュレータ")
+#    
+#    font_name = "C:/Windows/Fonts/meiryo.ttc"
+#    fntr = FontRenderer(screen, font_name=font_name,font_size=40)
+#    sfntr = FontRenderer(screen, font_name=font_name,font_size=30,color=(120,200,100))
+#    
+#    screen.fill((0, 0, 0))
+#    
+#    fntr.draw_center("hogehoge",(WIDTH//2,HEIGHT//2))
+#    sfntr.draw_center("12345",(WIDTH//2,HEIGHT//2+50))
+#
+#    pygame.display.flip()
+#
+#    time.sleep(3)
