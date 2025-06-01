@@ -183,6 +183,21 @@ class Signs:
         return self.signs[self.sidx]
 
 
+class SpeedMeter:
+    def __init__(self,screen):
+        font_name = "C:/Windows/Fonts/meiryo.ttc"
+        fnt_spd = FontRenderer(screen,font_name=font_name,font_size=70)
+        fnt_yomi = FontRenderer(font_name=font_name,font_size=30)
+
+    def draw(self,speed):
+        meter_pos = (int(WIDTH*0.17),int(HEIGHT*0.7))
+        self.text = self.draw_center(f"{self.speed}",True,WHITE)
+        self.screen.blit(self.text, (meter_pos[0],meter_pos[1]))
+
+        self.title = self.yomifont.render("はやさ",True,WHITE)
+        self.screen.blit(self.title, (meter_pos[0],meter_pos[1]+85))
+
+
 
 class Game:
     def __init__(self):
@@ -194,14 +209,19 @@ class Game:
 
         self.running = True
         self.speed = 0
+        self.spd_meter = SpeedMeter()
 
         self.stc = StateControl()
         self.stc.start()
 
         self.signs = Signs()
 
-        self.font = pygame.font.Font("C:/Windows/Fonts/meiryo.ttc", 70)
-        self.yomifont = pygame.font.Font("C:/Windows/Fonts/meiryo.ttc", 30)
+        #self.font = pygame.font.Font("C:/Windows/Fonts/meiryo.ttc", 70)
+        #self.yomifont = pygame.font.Font("C:/Windows/Fonts/meiryo.ttc", 30)
+
+#        font_name = "C:/Windows/Fonts/meiryo.ttc"
+#        fntr = FontRenderer(font_name=font_name,font_size=40)
+#        sfntr = FontRenderer(font_name=font_name,font_size=30,color=(120,200,100))
 
         self.snd_bell = SoundPlayer("./sound/Bell.mp3")
         self.snd_success = SoundPlayer("./sound/クイズ正解5.mp3")
@@ -270,14 +290,6 @@ class Game:
         self.screen.blit(self.text, (int(WIDTH*0.45),int(HEIGHT*0.2)))
 
 
-    def _draw_speed_meter(self,speed):
-        meter_pos = (int(WIDTH*0.17),int(HEIGHT*0.7))
-        self.text = self.font.render(f"{self.speed}",True,WHITE)
-        self.screen.blit(self.text, (meter_pos[0],meter_pos[1]))
-
-        self.title = self.yomifont.render("はやさ",True,WHITE)
-        self.screen.blit(self.title, (meter_pos[0],meter_pos[1]+85))
-
 
     def draw(self):
         self.screen.fill((0, 0, 0))
@@ -289,7 +301,8 @@ class Game:
         elif state == SC_State.RESULT:
             self._show_result(result)
 
-        self._draw_speed_meter(self.speed)
+        self.spd_meter(self.speed)
+        #self._draw_speed_meter(self.speed)
 
         pygame.display.flip()
 
