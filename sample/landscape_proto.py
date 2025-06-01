@@ -4,12 +4,17 @@ import time
 
 WIDTH,HEIGHT = 640,480
 
+GREEN = (0,180,0)
+GLAY = (128,128,128)
+CYAN = (0,240,240)
+ORANGERED = (255,69,0)
+
 FPS = 30
 
-class Landscape:
+class Train:
     def __init__(self,screen):
         self.screen = screen
-        self.pos = (200,180)
+        self.pos = (120,124)
         self.height = 50
         self.length = 163
 
@@ -29,10 +34,26 @@ class Landscape:
     def _car(self):
         self._wheel(10)
         rect_size = (self.length, self.height)
-        pygame.draw.rect(self.screen, (0,180,30), pygame.Rect(*self.pos,*rect_size), 100)
+        pygame.draw.rect(self.screen, ORANGERED, pygame.Rect(*self.pos,*rect_size))
 
     def draw(self):
         self._car()
+
+
+class Landscape:
+    def __init__(self,screen):
+        self.screen = screen
+        self.pos = (0,124 + 50 + 20)
+        self.height = 50
+        self.length = 163
+
+    def draw(self):
+        skypos = (0,0)
+        rect_size = (WIDTH,300)
+        pygame.draw.rect(self.screen, CYAN, pygame.Rect(*skypos,*rect_size))
+        rect_size = (WIDTH,130)
+        pygame.draw.rect(self.screen, GREEN, pygame.Rect(*self.pos,*rect_size))
+
 
 
 class Game:
@@ -44,6 +65,7 @@ class Game:
         self.clock = pygame.time.Clock()
 
         self.landscp = Landscape(self.screen)
+        self.train = Train(self.screen)
 
         self.running = True
         self.speed = 0
@@ -82,9 +104,10 @@ class Game:
         pass
 
     def draw(self):
-        self.screen.fill((0, 0, 0))
+        self.screen.fill((100, 0, 0))
 
         self.landscp.draw()
+        self.train.draw()
 
         pygame.display.flip()
 
