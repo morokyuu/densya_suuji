@@ -186,7 +186,7 @@ class Signs:
 
 class SpeedMeter:
     def __init__(self,screen):
-        font_name = "C:/Windows/Fonts/meiryo.ttc"
+        font_name = "./font/meiryo.ttc"
         self.fnt_spd = FontRenderer(screen,font_name=font_name,font_size=70)
         self.fnt_yomi = FontRenderer(screen,font_name=font_name,font_size=30)
 
@@ -203,7 +203,7 @@ class SignDisplay:
         self.bg_color = (255,255,255)
         self.border_color = (0, 0, 0)
         self.border_width = 4
-        font_name = "C:/Windows/Fonts/meiryo.ttc"
+        font_name = "./font/meiryo.ttc"
         self.fnt_spd = FontRenderer(screen,font_name=font_name,font_size=70,color=(0,0,0))
 
     def draw(self,speed):
