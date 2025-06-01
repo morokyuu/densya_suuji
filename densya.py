@@ -3,8 +3,10 @@ import sys
 import threading
 import time
 from timer import TimeoutWatcher
-from sound import SoundPlayer
 from sound import MotorSound
+
+## sound effect from
+## https://soundeffect-lab.info/
 
 WIDTH, HEIGHT = 640, 480
 FPS = 30
@@ -126,13 +128,10 @@ class StateControl:
                 result = ""
                 if self.cur_spd > self.spd_lim:
                     result = "over limit"
-#                    self.snd_delayed.play()
                 elif self.cur_spd < self.spd_lim * 0.8:
                     result = "delay occured"
-#                    self.snd_delayed.play()
                 else:
                     result = "successed"
-#                    self.snd_success.play()
 
                 tw = TimeoutWatcher(1)
                 while not tw.is_timeout():
@@ -140,6 +139,7 @@ class StateControl:
                     time.sleep(0.3)
                 print("done")
                 self.state = 0
+
 
 class Signs:
     def __init__(self):
@@ -183,16 +183,14 @@ class Game:
         self.font = pygame.font.Font("C:/Windows/Fonts/meiryo.ttc", 80)
         self.yomifont = pygame.font.Font("C:/Windows/Fonts/meiryo.ttc", 50)
 
-    ## sound effectはmp3ではなくてほかのが推奨らしい。musicは単一。soundは複数ｃｈ持てる
-        self.snd_bell = SoundPlayer("./sound/Bell.mp3")
-        self.snd_success = SoundPlayer("./sound/クイズ正解5.mp3")
-#        self.snd_delayed = SoundPlayer("./sound/クイズ不正解1.mp3")
-        #self.bell = SoundPlayer("./sound/Bell.mp3")
+        self.snd_bell = pygame.mixer.Sound("./sound/Bell.mp3")
+        self.snd_success = pygame.mixer.Sound("./sound/クイズ正解5.mp3")
+        self.snd_delayed = pygame.mixer.Sound("./sound/クイズ不正解1.mp3")
 
-        self.snd_success.play()
+        self.snd_bell.play()
 
         self.motor = MotorSound()
-#        self.motor.on()
+        self.motor.on()
 
 
     def run(self):
@@ -250,17 +248,6 @@ class Game:
 
 
 if __name__ == "__main__":
-    pygame.mixer.init()
-    snd_bell = SoundPlayer("./sound/Bell.mp3")
-    snd_success = SoundPlayer("./sound/クイズ正解5.mp3")
-
-    snd_bell.play()
-    snd_success.play()
-    time.sleep(0.3)
-    snd_success.play()
-    time.sleep(3)
-
-
-#    game = Game()
-#    game.run()
+    game = Game()
+    game.run()
 
