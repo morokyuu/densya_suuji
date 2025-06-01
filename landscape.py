@@ -47,13 +47,14 @@ class Tree:
         self.x = WIDTH + 40
         self.y = 140 
 
+        self.width = 40
+        self.height = 83 
+
     def draw(self):
-        width = 40
-        height = 83 
         points = [
             (self.x, self.y),
-            (self.x + width//2, self.y + width),
-            (self.x - width//2, self.y + width)
+            (self.x + self.width//2, self.y + self.width),
+            (self.x - self.width//2, self.y + self.width)
         ]
         pygame.draw.polygon(self.screen, FORESTGREEN, points)
         rect_size = (8,50)
@@ -61,6 +62,12 @@ class Tree:
 
     def update(self,speed):
         self.x -= speed * 0.09
+
+    def is_out(self):
+        if self.x < -self.width:
+            return True
+        return False
+
 
 class Sky:
     def __init__(self,screen):
@@ -81,16 +88,30 @@ class Landscape:
         self.screen = screen
         self.sky = Sky(screen)
         self.train = Train(screen)
-        self.tree = Tree(screen)
+
+        self.trees = [Tree(screen)]
+        self.count = 0
 
     def draw(self):
         self.sky.draw()
-        self.tree.draw()
+
+        for tree in self.trees:
+            tree.draw()
+
         self.train.draw()
 
-    def update(self,speed):
-        self.tree.update(speed)
+    def _update_pos(self,speed):
+        for tree in self.trees:
+            tree.update(speed)
 
+        self.trees = [t for t in self.trees if not t.is_out()]
+
+
+    def update(self,speed):
+        self._update_pos(speed)
+
+        if len(self.trees) == 0:
+            self.trees.append(Tree(self.screen))
 
 
 class Game:
