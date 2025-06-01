@@ -232,7 +232,7 @@ class ResultDisplay:
                 Result.DELAYED:self.snd_delayed.play
                 }
 
-        font_name = "C:/Windows/Fonts/meiryo.ttc"
+        font_name = "./font/meiryo.ttc"
         self.fnt_result = FontRenderer(screen,font_name=font_name,font_size=60)
 
     def show(self,result):
