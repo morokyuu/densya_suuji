@@ -78,11 +78,17 @@ class SC_State(Enum):
     SIGN = 1
     RESULT = 2
 
+class Result(Enum):
+    SUCCESS = 0
+    OVERLIM = 1
+    DELAYED = 2
+
 class StateControl:
     def __init__(self):
         self.cur_spd = 0
         self.spd_lim = 0
         self.state = SC_State.RUN
+        self.result = Result.SUCCESS
 
         self.stop_event = threading.Event()
 
@@ -108,6 +114,9 @@ class StateControl:
 
     def inform_curspd(self,new_spd):
         self.cur_spd = new_spd
+    
+    def get_state(self):
+        return self.state, self.result
 
     def _loop(self):
         while not self.stop_event.is_set():
@@ -130,13 +139,15 @@ class StateControl:
                 # result disp
                 print("start result disp state")
 
-                result = ""
                 if self.cur_spd > self.spd_lim:
-                    result = "over limit"
+                    print("over limit")
+                    self.result = Result.OVERLIM
                 elif self.cur_spd < self.spd_lim * 0.8:
-                    result = "delay occured"
+                    print("delay occured")
+                    self.result = Result.DELAYED
                 else:
-                    result = "successed"
+                    print("successed")
+                    self.result = Result.SUCCESS
 
                 tw = TimeoutWatcher(1)
                 while not tw.is_timeout():
@@ -168,6 +179,8 @@ class Signs:
     @property
     def sign(self):
         return self.signs[self.sidx]
+
+
 
 class Game:
     def __init__(self):
@@ -240,6 +253,19 @@ class Game:
     def draw(self):
         self.screen.fill((0, 0, 0))
 
+        state,result = self.stc.get_state()
+        if state == SC_State.SIGN:
+            self.text = self.font.render(f"{self.signs.sign}",True,WHITE)
+            self.screen.blit(self.text, (int(WIDTH*0.75),int(HEIGHT*0.7)))
+        elif state == SC_State.RESULT:
+            msg = {
+                    Result.SUCCESS:"successed",
+                    Result.OVERLIM:"over limit",
+                    Result.DELAYED:"delayed"
+                    }
+            self.text = self.font.render(f"{msg[result]}",True,WHITE)
+            self.screen.blit(self.text, (int(WIDTH*0.45),int(HEIGHT*0.2)))
+
         self.text = self.font.render(f"{self.speed}",True,WHITE)
         self.screen.blit(self.text, (int(WIDTH*0.17),int(HEIGHT*0.7)))
 
@@ -254,6 +280,14 @@ class Game:
 
 
 if __name__ == "__main__":
-    game = Game()
-    game.run()
+    msg = {
+            Result.SUCCESS:"successed",
+            Result.OVERLIM:"over limit",
+            Result.DELAYED:"delayed"
+            }
+    result = Result.SUCCESS
+    print(f"{msg[result]}")
+
+#    game = Game()
+#    game.run()
 
