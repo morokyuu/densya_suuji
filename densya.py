@@ -151,7 +151,7 @@ class StateControl:
 
                 tw = TimeoutWatcher(1)
                 while not tw.is_timeout():
-                    print(result)
+                    print(self.result)
                     time.sleep(0.3)
                 print("done")
                 self.state = SC_State.RUN
@@ -258,12 +258,12 @@ class Game:
             self.text = self.font.render(f"{self.signs.sign}",True,WHITE)
             self.screen.blit(self.text, (int(WIDTH*0.75),int(HEIGHT*0.7)))
         elif state == SC_State.RESULT:
-            msg = {
+            result_msg = {
                     Result.SUCCESS:"successed",
                     Result.OVERLIM:"over limit",
                     Result.DELAYED:"delayed"
                     }
-            self.text = self.font.render(f"{msg[result]}",True,WHITE)
+            self.text = self.font.render(f"{result_msg[result]}",True,WHITE)
             self.screen.blit(self.text, (int(WIDTH*0.45),int(HEIGHT*0.2)))
 
         self.text = self.font.render(f"{self.speed}",True,WHITE)
@@ -280,14 +280,14 @@ class Game:
 
 
 if __name__ == "__main__":
-    msg = {
-            Result.SUCCESS:"successed",
-            Result.OVERLIM:"over limit",
-            Result.DELAYED:"delayed"
-            }
-    result = Result.SUCCESS
-    print(f"{msg[result]}")
+#    msg = {
+#            Result.SUCCESS:"successed",
+#            Result.OVERLIM:"over limit",
+#            Result.DELAYED:"delayed"
+#            }
+#    result = Result.SUCCESS
+#    print(f"{msg[result]}")
 
-#    game = Game()
-#    game.run()
+    game = Game()
+    game.run()
 
