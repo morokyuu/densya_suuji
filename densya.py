@@ -199,13 +199,13 @@ class Game:
 
         self.signs = Signs()
 
-        self.font = pygame.font.Font("C:/Windows/Fonts/meiryo.ttc", 80)
+        self.font = pygame.font.Font("C:/Windows/Fonts/meiryo.ttc", 70)
         self.yomifont = pygame.font.Font("C:/Windows/Fonts/meiryo.ttc", 30)
 
-        self.snd_bell = pygame.mixer.Sound("./sound/Bell.mp3")
-        self.snd_success = pygame.mixer.Sound("./sound/クイズ正解5.mp3")
-        self.snd_delayed = pygame.mixer.Sound("./sound/警告音1.mp3")
-        self.snd_overlim = pygame.mixer.Sound("./sound/クイズ不正解1.mp3")
+        self.snd_bell = SoundPlayer("./sound/Bell.mp3")
+        self.snd_success = SoundPlayer("./sound/クイズ正解5.mp3")
+        self.snd_delayed = SoundPlayer("./sound/警告音1.mp3")
+        self.snd_overlim = SoundPlayer("./sound/クイズ不正解1.mp3")
 
         self.snd_bell.play()
 
@@ -301,29 +301,6 @@ class Game:
 
 
 if __name__ == "__main__":
-#    game = Game()
-#    game.run()
-
-    pygame.mixer.init()
-    snd_bell = SoundPlayer("./sound/Bell.mp3")
-    snd_success = SoundPlayer("./sound/クイズ正解5.mp3")
-    snd_delayed = SoundPlayer("./sound/警告音1.mp3")
-    snd_overlim = SoundPlayer("./sound/クイズ不正解1.mp3")
-
-    result_sound = {
-            Result.SUCCESS:snd_success,
-            Result.OVERLIM:snd_overlim,
-            Result.DELAYED:snd_delayed
-            }
-    result = Result.OVERLIM
-
-    channel = None
-    result_sound[result].play()
-    time.sleep(0.2)
-    result_sound[result].play()
-    time.sleep(0.3)
-    result_sound[result].play()
-
-    time.sleep(3)
-
+    game = Game()
+    game.run()
 
