@@ -20,6 +20,7 @@ BLACK = (0, 0, 0)
 BLUE = (100, 100, 255)
 
 
+RESULT_DISP_DURATION = 2
 
 class Triangle:
     def __init__(self):
@@ -125,12 +126,12 @@ class StateControl:
 
             if self.state == SC_State.RUN:
                 print("main")
-                time.sleep(0.5)
+                time.sleep(0.3)
 
             elif self.state == SC_State.SIGN:
                 # sign found
                 print("start input state")
-                tw = TimeoutWatcher(3)
+                tw = TimeoutWatcher(2)
                 while not tw.is_timeout():
                     print("input state")
                     time.sleep(0.3)
@@ -151,7 +152,7 @@ class StateControl:
                     print("successed")
                     self.result = Result.SUCCESS
 
-                tw = TimeoutWatcher(1)
+                tw = TimeoutWatcher(RESULT_DISP_DURATION)
                 while not tw.is_timeout():
                     print(self.result)
                     time.sleep(0.3)
@@ -211,12 +212,21 @@ class ResultDisplay:
                 Result.OVERLIM:self.snd_overlim.play,
                 Result.DELAYED:self.snd_delayed.play
                 }
+
         font_name = "C:/Windows/Fonts/meiryo.ttc"
         self.fnt_result = FontRenderer(screen,font_name=font_name,font_size=60)
+        self.start_time = 0
 
     def show(self,result):
         self.fnt_result.draw_center(f"{self.result_msg[result]}",(WIDTH//2,HEIGHT//2))
-        self.result_sound[result]()
+
+        if time.perf_counter() - self.start_time < RESULT_DISP_DURATION:
+            print("   pass")
+            pass
+        else:
+            print("   play")
+            self.result_sound[result]()
+            self.start_time = time.perf_counter()
 
 
 class Game:
@@ -237,12 +247,7 @@ class Game:
 
         self.signs = Signs()
 
-#        font_name = "C:/Windows/Fonts/meiryo.ttc"
-#        fntr = FontRenderer(font_name=font_name,font_size=40)
-#        sfntr = FontRenderer(font_name=font_name,font_size=30,color=(120,200,100))
-
         self.snd_bell = SoundPlayer("./sound/Bell.mp3")
-
         self.snd_bell.play()
 
         self.motor = MotorSound()
@@ -319,22 +324,4 @@ if __name__ == "__main__":
     game.run()
 
 
-#    WIDTH,HEIGHT = 640,480
-#
-#    pygame.init()
-#    pygame.mixer.init()
-#    screen = pygame.display.set_mode((WIDTH, HEIGHT))
-#    pygame.display.set_caption("電車シミュレータ")
-#    
-#    font_name = "C:/Windows/Fonts/meiryo.ttc"
-#    fntr = FontRenderer(screen, font_name=font_name,font_size=40)
-#    sfntr = FontRenderer(screen, font_name=font_name,font_size=30,color=(120,200,100))
-#    
-#    screen.fill((0, 0, 0))
-#    
-#    fntr.draw_center("hogehoge",(WIDTH//2,HEIGHT//2))
-#    sfntr.draw_center("12345",(WIDTH//2,HEIGHT//2+50))
-#
-#    pygame.display.flip()
-#
-#    time.sleep(3)
+
