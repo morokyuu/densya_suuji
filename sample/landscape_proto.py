@@ -8,6 +8,8 @@ GREEN = (0,180,0)
 GLAY = (128,128,128)
 CYAN = (0,240,240)
 ORANGERED = (255,69,0)
+FORESTGREEN = (34,139,34)
+BROWN = (139,69,19)
 
 FPS = 30
 
@@ -39,6 +41,16 @@ class Train:
     def draw(self):
         self._car()
 
+class Trees:
+    def __init__(self,screen):
+        self.screen = screen
+        self.x = WIDTH + 40
+
+    def draw(self):
+        pass
+
+    def update(self):
+        self.x -= 3
 
 class Landscape:
     def __init__(self,screen):
@@ -52,7 +64,7 @@ class Landscape:
         rect_size = (WIDTH,300)
         pygame.draw.rect(self.screen, CYAN, pygame.Rect(*skypos,*rect_size))
         rect_size = (WIDTH,130)
-        pygame.draw.rect(self.screen, GREEN, pygame.Rect(*self.pos,*rect_size))
+        pygame.draw.rect(self.screen, BROWN, pygame.Rect(*self.pos,*rect_size))
 
 
 
