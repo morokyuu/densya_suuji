@@ -310,10 +310,19 @@ if __name__ == "__main__":
     snd_overlim = pygame.mixer.Sound("./sound/クイズ不正解1.mp3")
 
     result_sound = {
-            Result.SUCCESS:snd_success.play,
-            Result.OVERLIM:snd_overlim.play,
-            Result.DELAYED:snd_delayed.play
+            Result.SUCCESS:snd_success,
+            Result.OVERLIM:snd_overlim,
+            Result.DELAYED:snd_delayed
             }
     result = Result.OVERLIM
-    result_sound[result]()
+
+    channel = None
+    result_sound[result].play()
+
+    while True:
+        if channel is None or not channel.get_busy():
+            result_sound[result].play()
+            break
     time.sleep(3)
+
+
