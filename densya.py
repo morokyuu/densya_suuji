@@ -198,12 +198,21 @@ class SpeedMeter:
 
 class SignDisplay:
     def __init__(self,screen):
+        self.screen = screen
+        self.size = 100
+        self.bg_color = (255,255,255)
+        self.border_color = (0, 0, 0)
+        self.border_width = 4
         font_name = "C:/Windows/Fonts/meiryo.ttc"
-        self.fnt_spd = FontRenderer(screen,font_name=font_name,font_size=70)
+        self.fnt_spd = FontRenderer(screen,font_name=font_name,font_size=70,color=(0,0,0))
 
     def draw(self,speed):
-        pos = (int(WIDTH*0.85),int(HEIGHT*0.7))
-        self.fnt_spd.draw_center(f"{speed}",pos)
+        rect = pygame.Rect(0, 0, self.size, self.size)
+        rect.center = (int(WIDTH*0.84),int(HEIGHT*0.7))
+        pygame.draw.rect(self.screen, self.bg_color, rect)
+        pygame.draw.rect(self.screen, self.border_color, rect, width=self.border_width)
+        self.fnt_spd.draw_center(f"{speed}", rect.center)
+
 
 
 class ResultDisplay:
