@@ -6,6 +6,7 @@ from timer import TimeoutWatcher
 from sound import MotorSound
 from sound import SoundPlayer
 from enum import Enum
+from font import FontRenderer
 
 ## sound effect from
 ## https://soundeffect-lab.info/
@@ -304,24 +305,26 @@ if __name__ == "__main__":
 #    game = Game()
 #    game.run()
 
+
+    WIDTH,HEIGHT = 640,480
+
     pygame.init()
     pygame.mixer.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("電車シミュレータ")
-
-    font = pygame.font.Font("C:/Windows/Fonts/meiryo.ttc", 70)
-    yomifont = pygame.font.Font("C:/Windows/Fonts/meiryo.ttc", 30)
-
-    text = font.render("hogehoge",True,WHITE)
-    size = font.size("hogehoge")
-    print(size)
-
+    
+    font_name = "C:/Windows/Fonts/meiryo.ttc"
+    fntr = FontRenderer(font_name=font_name,font_size=40)
+    sfntr = FontRenderer(font_name=font_name,font_size=30,color=(120,200,100))
+    
     screen.fill((0, 0, 0))
 
-    screen.blit(text, (100,100))
+    #screen.blit(text, (100,100))
+    
+    fntr.draw_center(screen,"hogehoge",(WIDTH//2,HEIGHT//2))
+    
+    sfntr.draw_center(screen,"12345",(WIDTH//2,HEIGHT//2+50))
 
     pygame.display.flip()
 
     time.sleep(3)
-
-

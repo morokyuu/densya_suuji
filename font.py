@@ -1,8 +1,6 @@
 import pygame
 import time
 
-WIDTH,HEIGHT = 640,480
-
 class FontRenderer:
     def __init__(self, font_name=None, font_size=30, color=(255, 255, 255), antialias=True):
         self.font = pygame.font.Font(font_name, font_size)
@@ -29,6 +27,8 @@ class FontRenderer:
 
 
 if __name__ == "__main__":
+
+    WIDTH,HEIGHT = 640,480
 
     pygame.init()
     pygame.mixer.init()
