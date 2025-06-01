@@ -3,6 +3,17 @@ import threading
 from pyo import *
 
 
+class SoundPlayer:
+    def __init__(self, filepath: str):
+        self.sound_channels = {} # 各音ごとのチャンネルを保持する辞書
+        self.filepath = filepath
+        self.sound = pygame.mixer.Sound(self.filepath)
+
+    def play(self):
+        ch = self.sound_channels.get(self.sound)
+        if ch is None or not ch.get_busy():
+            self.sound_channels[self.sound] = self.sound.play()
+
 
 class MotorSound:
     def __init__(self, base_freq=300.0, freq_scale=5.0, volume=0.2):

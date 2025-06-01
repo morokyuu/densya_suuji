@@ -4,6 +4,7 @@ import threading
 import time
 from timer import TimeoutWatcher
 from sound import MotorSound
+from sound import SoundPlayer
 from enum import Enum
 
 ## sound effect from
@@ -304,10 +305,10 @@ if __name__ == "__main__":
 #    game.run()
 
     pygame.mixer.init()
-    snd_bell = pygame.mixer.Sound("./sound/Bell.mp3")
-    snd_success = pygame.mixer.Sound("./sound/クイズ正解5.mp3")
-    snd_delayed = pygame.mixer.Sound("./sound/警告音1.mp3")
-    snd_overlim = pygame.mixer.Sound("./sound/クイズ不正解1.mp3")
+    snd_bell = SoundPlayer("./sound/Bell.mp3")
+    snd_success = SoundPlayer("./sound/クイズ正解5.mp3")
+    snd_delayed = SoundPlayer("./sound/警告音1.mp3")
+    snd_overlim = SoundPlayer("./sound/クイズ不正解1.mp3")
 
     result_sound = {
             Result.SUCCESS:snd_success,
@@ -318,11 +319,11 @@ if __name__ == "__main__":
 
     channel = None
     result_sound[result].play()
+    time.sleep(0.2)
+    result_sound[result].play()
+    time.sleep(0.3)
+    result_sound[result].play()
 
-    while True:
-        if channel is None or not channel.get_busy():
-            result_sound[result].play()
-            break
     time.sleep(3)
 
 
