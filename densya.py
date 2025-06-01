@@ -301,6 +301,27 @@ class Game:
 
 
 if __name__ == "__main__":
-    game = Game()
-    game.run()
+#    game = Game()
+#    game.run()
+
+    pygame.init()
+    pygame.mixer.init()
+    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    pygame.display.set_caption("電車シミュレータ")
+
+    font = pygame.font.Font("C:/Windows/Fonts/meiryo.ttc", 70)
+    yomifont = pygame.font.Font("C:/Windows/Fonts/meiryo.ttc", 30)
+
+    text = font.render("hogehoge",True,WHITE)
+    size = font.size("hogehoge")
+    print(size)
+
+    screen.fill((0, 0, 0))
+
+    screen.blit(text, (100,100))
+
+    pygame.display.flip()
+
+    time.sleep(3)
+
 
