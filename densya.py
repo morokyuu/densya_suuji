@@ -20,7 +20,7 @@ BLACK = (0, 0, 0)
 BLUE = (100, 100, 255)
 
 
-RESULT_DISP_DURATION = 2
+RESULT_DISP_DURATION = 0.8
 
 class Triangle:
     def __init__(self):
@@ -196,6 +196,16 @@ class SpeedMeter:
         self.fnt_yomi.draw_center("はやさ",(meter_pos[0],meter_pos[1]+85))
 
 
+class SignDisplay:
+    def __init__(self,screen):
+        font_name = "C:/Windows/Fonts/meiryo.ttc"
+        self.fnt_spd = FontRenderer(screen,font_name=font_name,font_size=70)
+
+    def draw(self,speed):
+        pos = (int(WIDTH*0.85),int(HEIGHT*0.7))
+        self.fnt_spd.draw_center(f"{speed}",pos)
+
+
 class ResultDisplay:
     def __init__(self,screen):
         self.snd_success = SoundPlayer("./sound/クイズ正解5.mp3")
@@ -215,18 +225,10 @@ class ResultDisplay:
 
         font_name = "C:/Windows/Fonts/meiryo.ttc"
         self.fnt_result = FontRenderer(screen,font_name=font_name,font_size=60)
-        self.start_time = 0
 
     def show(self,result):
         self.fnt_result.draw_center(f"{self.result_msg[result]}",(WIDTH//2,HEIGHT//2))
-
-        if time.perf_counter() - self.start_time < RESULT_DISP_DURATION:
-            print("   pass")
-            pass
-        else:
-            print("   play")
-            self.result_sound[result]()
-            self.start_time = time.perf_counter()
+        self.result_sound[result]()
 
 
 class Game:
@@ -241,6 +243,7 @@ class Game:
         self.speed = 0
         self.spd_meter = SpeedMeter(self.screen)
         self.res_display = ResultDisplay(self.screen)
+        self.sign_display = SignDisplay(self.screen)
 
         self.stc = StateControl()
         self.stc.start()
@@ -300,9 +303,7 @@ class Game:
 
         state,result = self.stc.get_state()
         if state == SC_State.SIGN:
-            #self.text = self.font.render(f"{self.signs.sign}",True,WHITE)
-            #self.screen.blit(self.text, (int(WIDTH*0.75),int(HEIGHT*0.7)))
-            pass
+            self.sign_display.draw(self.signs.sign)
         elif state == SC_State.RESULT:
             self.res_display.show(result)
 
