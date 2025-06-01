@@ -45,9 +45,20 @@ class Trees:
     def __init__(self,screen):
         self.screen = screen
         self.x = WIDTH + 40
+        self.y = 140 
 
     def draw(self):
-        pass
+        width = 40
+        height = 83 
+        points = [
+            (self.x, self.y),
+            (self.x + width//2, self.y + width),
+            (self.x - width//2, self.y + width)
+        ]
+        pygame.draw.polygon(self.screen, FORESTGREEN, points)
+        rect_size = (8,50)
+        pygame.draw.rect(self.screen, BROWN, pygame.Rect(self.x-4,self.y+40,*rect_size))
+        
 
     def update(self):
         self.x -= 3
@@ -78,6 +89,7 @@ class Game:
 
         self.landscp = Landscape(self.screen)
         self.train = Train(self.screen)
+        self.tree = Trees(self.screen)
 
         self.running = True
         self.speed = 0
@@ -119,7 +131,10 @@ class Game:
         self.screen.fill((100, 0, 0))
 
         self.landscp.draw()
+        self.tree.draw()
         self.train.draw()
+
+        self.tree.update()
 
         pygame.display.flip()
 
