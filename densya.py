@@ -199,11 +199,12 @@ class Game:
         self.signs = Signs()
 
         self.font = pygame.font.Font("C:/Windows/Fonts/meiryo.ttc", 80)
-        self.yomifont = pygame.font.Font("C:/Windows/Fonts/meiryo.ttc", 50)
+        self.yomifont = pygame.font.Font("C:/Windows/Fonts/meiryo.ttc", 30)
 
         self.snd_bell = pygame.mixer.Sound("./sound/Bell.mp3")
         self.snd_success = pygame.mixer.Sound("./sound/クイズ正解5.mp3")
-        self.snd_delayed = pygame.mixer.Sound("./sound/クイズ不正解1.mp3")
+        self.snd_delayed = pygame.mixer.Sound("./sound/警告音1.mp3")
+        self.snd_overlim = pygame.mixer.Sound("./sound/クイズ不正解1.mp3")
 
         self.snd_bell.play()
 
@@ -250,6 +251,32 @@ class Game:
             self.stc.inform_sign(self.signs.sign)
             self.snd_bell.play()
 
+    def _show_result(self,result):
+        result_msg = {
+                Result.SUCCESS:"successed",
+                Result.OVERLIM:"over limit",
+                Result.DELAYED:"delayed"
+                }
+        result_sound = {
+                Result.SUCCESS:self.snd_success.play,
+                Result.OVERLIM:self.snd_overlim.play,
+                Result.DELAYED:self.snd_delayed.play
+                }
+        result_sound[result]()
+
+        self.text = self.font.render(f"{result_msg[result]}",True,WHITE)
+        self.screen.blit(self.text, (int(WIDTH*0.45),int(HEIGHT*0.2)))
+
+
+    def _draw_speed_meter(self,speed):
+        meter_pos = (int(WIDTH*0.17),int(HEIGHT*0.7))
+        self.text = self.font.render(f"{self.speed}",True,WHITE)
+        self.screen.blit(self.text, (meter_pos[0],meter_pos[1]))
+
+        self.title = self.yomifont.render("はやさ",True,WHITE)
+        self.screen.blit(self.title, (meter_pos[0],meter_pos[1]+85))
+
+
     def draw(self):
         self.screen.fill((0, 0, 0))
 
@@ -258,16 +285,9 @@ class Game:
             self.text = self.font.render(f"{self.signs.sign}",True,WHITE)
             self.screen.blit(self.text, (int(WIDTH*0.75),int(HEIGHT*0.7)))
         elif state == SC_State.RESULT:
-            result_msg = {
-                    Result.SUCCESS:"successed",
-                    Result.OVERLIM:"over limit",
-                    Result.DELAYED:"delayed"
-                    }
-            self.text = self.font.render(f"{result_msg[result]}",True,WHITE)
-            self.screen.blit(self.text, (int(WIDTH*0.45),int(HEIGHT*0.2)))
+            self._show_result(result)
 
-        self.text = self.font.render(f"{self.speed}",True,WHITE)
-        self.screen.blit(self.text, (int(WIDTH*0.17),int(HEIGHT*0.7)))
+        self._draw_speed_meter(self.speed)
 
         pygame.display.flip()
 
@@ -280,14 +300,20 @@ class Game:
 
 
 if __name__ == "__main__":
-#    msg = {
-#            Result.SUCCESS:"successed",
-#            Result.OVERLIM:"over limit",
-#            Result.DELAYED:"delayed"
-#            }
-#    result = Result.SUCCESS
-#    print(f"{msg[result]}")
+#    game = Game()
+#    game.run()
 
-    game = Game()
-    game.run()
+    pygame.mixer.init()
+    snd_bell = pygame.mixer.Sound("./sound/Bell.mp3")
+    snd_success = pygame.mixer.Sound("./sound/クイズ正解5.mp3")
+    snd_delayed = pygame.mixer.Sound("./sound/警告音1.mp3")
+    snd_overlim = pygame.mixer.Sound("./sound/クイズ不正解1.mp3")
 
+    result_sound = {
+            Result.SUCCESS:snd_success.play,
+            Result.OVERLIM:snd_overlim.play,
+            Result.DELAYED:snd_delayed.play
+            }
+    result = Result.OVERLIM
+    result_sound[result]()
+    time.sleep(3)
